@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class PrepareDelivery
-  TRUCKS = { kamaz: 3000, gazel: 1000 }.freeze
+require_relative 'truck'
 
+class PrepareDelivery
   def initialize(order, user)
     @order = order
     @user = user
@@ -10,12 +10,11 @@ class PrepareDelivery
 
   def perform(destination_address, delivery_date)
     result = { truck: nil, weight: nil, order_number: @order.id, address: destination_address, status: :ok }
+    result[:truck] = Truck.choose(@order.sum)
 
-    validate!(destination_address, delivery_date)
-
-    weight = @order.sum
-    result[:truck] = choose_track(weight)
-    validate_truck(result[:truck])
+    destination_address.validate!
+    validate_delivery_date!(delivery_date)
+    validate_truck_presence(result[:truck])
 
     result
   rescue StandardError => e
@@ -25,23 +24,13 @@ class PrepareDelivery
     result
   end
 
-  def choose_track(weight)
-    TRUCKS.keys.each { return _1 if TRUCKS[_1] > weight }
-
-    nil
-  end
-
   private
 
-  def validate!(destination_address, delivery_date)
+  def validate_delivery_date!(delivery_date)
     raise 'Дата доставки уже прошла' if delivery_date < Date.today
-
-    if destination_address.city.empty? || destination_address.street.empty? || destination_address.house.empty?
-      raise 'Нет адреса'
-    end
   end
 
-  def validate_truck(result)
+  def validate_truck_presence(result)
     raise 'Нет машины' if result.nil?
   end
 end

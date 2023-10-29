@@ -22,27 +22,17 @@ class TestPrepareDelivery < Minitest::Test
     assert_equal :ok, result[:status]
   end
 
-  def test_perform_fail_with_old_date_data
+  def test_perform_fail_with_invalid_data
     result = @prepare_delivery.perform(@address, Date.today - 1)
 
     assert_kind_of Hash, result
     assert_equal :error, result[:status]
     assert_equal 'Дата доставки уже прошла', result[:error_message]
-  end
 
-  def test_perform_fail_without_address
     result = @prepare_delivery.perform(@invalid_address, Date.today)
 
     assert_kind_of Hash, result
     assert_equal :error, result[:status]
     assert_equal 'Нет адреса', result[:error_message]
-  end
-
-  def test_choose_track
-    result = @prepare_delivery.choose_track(40)
-    assert_equal :kamaz, result
-
-    result = @prepare_delivery.choose_track(4000)
-    assert_equal nil, result
   end
 end

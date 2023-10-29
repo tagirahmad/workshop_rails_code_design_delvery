@@ -8,4 +8,8 @@ class Address
     @street = street
     @house = house
   end
+
+  def validate!
+    raise 'Нет адреса' if city.empty? || street.empty? || house.empty?
+  end
 end
