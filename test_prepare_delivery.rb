@@ -37,4 +37,12 @@ class TestPrepareDelivery < Minitest::Test
     assert_equal :error, result[:status]
     assert_equal 'Нет адреса', result[:error_message]
   end
+
+  def test_choose_track
+    result = @prepare_delivery.choose_track(40)
+    assert_equal :kamaz, result
+
+    result = @prepare_delivery.choose_track(4000)
+    assert_equal nil, result
+  end
 end
