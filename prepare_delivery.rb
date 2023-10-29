@@ -13,10 +13,9 @@ class PrepareDelivery
 
     validate!(destination_address, delivery_date)
 
-    weight = @order.products.map(&:weight).sum
+    weight = @order.sum
     TRUCKS.keys.each { |key| result[:truck] = key if TRUCKS[key.to_sym] > weight }
-    
-    raise 'Нет машины' if result[:truck].nil?
+    validate_truck(result)
 
     result
   rescue StandardError => e
@@ -31,5 +30,9 @@ class PrepareDelivery
   def validate!(destination_address, delivery_date)
     raise 'Дата доставки уже прошла' if delivery_date < Date.today
     raise 'Нет адреса' if destination_address.city.empty? || destination_address.street.empty? || destination_address.house.empty?
+  end
+
+  def validate_truck(result)
+    raise 'Нет машины' if result[:truck].nil?
   end
 end

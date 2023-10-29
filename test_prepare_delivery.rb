@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "minitest/autorun"
+require 'minitest/autorun'
 require 'ostruct'
 require 'date'
 
@@ -11,8 +11,8 @@ require_relative 'order'
 class TestPrepareDelivery < Minitest::Test
   def setup
     @prepare_delivery = PrepareDelivery.new(Order.new, OpenStruct.new)
-    @address = Address.new(city: "Ростов-на-Дону", street: "ул. Маршала Конюхова", house: "д. 5")
-    @invalid_address = Address.new(city: '', street: "ул. Маршала Конюхова", house: "д. 5")
+    @address = Address.new(city: 'Ростов-на-Дону', street: 'ул. Маршала Конюхова', house: 'д. 5')
+    @invalid_address = Address.new(city: '', street: 'ул. Маршала Конюхова', house: 'д. 5')
   end
 
   def test_perform_success_with_valid_data
