@@ -12,6 +12,6 @@ class Order
   end
 
   def sum
-    products.map(&:weight).sum
+    products.sum(&:weight)
   end
 end

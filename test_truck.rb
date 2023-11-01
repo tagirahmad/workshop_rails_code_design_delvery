@@ -10,10 +10,10 @@ class TestPrepareDelivery < Minitest::Test
   end
 
   def test_choose_track
-    result = @truck.choose(40)
+    result = @truck.find_proper(40)
     assert_equal :kamaz, result
 
-    result = @truck.choose(4000)
+    result = @truck.find_proper(4000)
     assert_equal nil, result
   end
 end

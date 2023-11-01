@@ -33,6 +33,10 @@ class TestPrepareDelivery < Minitest::Test
 
     assert_kind_of Hash, result
     assert_equal :error, result[:status]
-    assert_equal 'Нет адреса', result[:error_message]
+    assert_equal 'Нет города', result[:error_message]
+
+    # assert_raises Address::ValidationError do
+    #   result = @prepare_delivery.perform(@invalid_address, Date.today)
+    # end
   end
 end
