@@ -5,6 +5,7 @@ require 'ostruct'
 require 'date'
 
 require_relative 'prepare_delivery'
+require_relative 'delivery'
 require_relative 'address'
 require_relative 'order'
 
@@ -18,25 +19,21 @@ class TestPrepareDelivery < Minitest::Test
   def test_perform_success_with_valid_data
     result = @prepare_delivery.perform(@address, Date.today)
 
-    assert_kind_of Hash, result
-    assert_equal :ok, result[:status]
+    assert_kind_of Delivery, result
+    assert_equal true, result.success?
   end
 
   def test_perform_fail_with_invalid_data
     result = @prepare_delivery.perform(@address, Date.today - 1)
 
-    assert_kind_of Hash, result
-    assert_equal :error, result[:status]
-    assert_equal 'Дата доставки уже прошла', result[:error_message]
+    assert_kind_of Delivery, result
+    assert_equal :error, result.status
+    assert_equal 'Дата доставки уже прошла', result.error_message
 
     result = @prepare_delivery.perform(@invalid_address, Date.today)
 
-    assert_kind_of Hash, result
-    assert_equal :error, result[:status]
-    assert_equal 'Нет города', result[:error_message]
-
-    # assert_raises Address::ValidationError do
-    #   result = @prepare_delivery.perform(@invalid_address, Date.today)
-    # end
+    assert_kind_of Delivery, result
+    assert_equal :error, result.status
+    assert_equal 'Нет города', result.error_message
   end
 end

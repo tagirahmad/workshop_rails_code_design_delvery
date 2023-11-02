@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'error'
+require_relative 'delivery'
 
 class Address
   attr_reader :city, :street, :house
@@ -14,6 +14,6 @@ class Address
   end
 
   def validate!
-    ERROR_TEXTS.each { |error, attribute| raise Error::Validation, error if send(attribute).empty? }
+    ERROR_TEXTS.each { |error, attribute| raise Delivery::ValidationError, error if send(attribute).empty? }
   end
 end
