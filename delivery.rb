@@ -1,50 +1,44 @@
 # frozen_string_literal: true
 
-class PrepareDelivery
-  TRUCKS = { kamaz: 3000, gazel: 1000 }
+class Delivery
+  ValidationError = Class.new StandardError
 
-  def initialize(order, user)
-    @order = order
-    @user = user
+  attr_reader :truck, :weight, :order_number, :address, :date, :status, :error_message
+
+  def initialize(opts = {})
+    @truck = opts[:truck]
+    @weight = opts[:weight]
+    @order_number = opts[:order_number]
+    @address = opts[:address]
+    @date = opts[:date]
+
+    @status = :ok  if validate
   end
 
-  def perform(destination_address, delivery_date)
-    result = { truck: nil, weight: nil, order_number: @order.id, address: destination_address, status: :ok }
-    raise "Дата доставки уже прошла" if delivery_date < Time.current
-    raise "Нет адреса" if destination_address.city.empty? || destination_address.street.empty? || destination_address.house.empty?
-
-    weight = @order.products.map(&:weight).sum
-    TRUCKS.keys.each { |key| result[:truck] = key if TRUCKS[key.to_sym] > weight }
-    raise "Нет машины" if result[:truck].nil?
-
-    result
-  rescue StandardError
-    result[:satus] = "error"
-  end
-end
-
-class Order
-  def id
-    'id'
+  def success?
+    @status == :ok
   end
 
-  def products
-    [OpenStruct.new(weight: 20), OpenStruct.new(weight: 40)]
-  end
-end
+  private
 
-class Address
-  def city
-    "Ростов-на-Дону"
+  def validate
+    address.validate!
+    validate_delivery_date!(date)
+    validate_truck_presence!(truck)
+
+    true
+  rescue ValidationError => e
+    @status = :error
+    @error_message = e.to_s
+
+    false
   end
 
-  def street
-    "ул. Маршала Конюхова"
+  def validate_delivery_date!(delivery_date)
+    raise ValidationError, 'Дата доставки уже прошла' if delivery_date < Date.today
   end
 
-  def house
-    "д. 5"
+  def validate_truck_presence!(result)
+    raise ValidationError, 'Нет машины' if result.nil?
   end
 end
-
-PrepareDelivery.new(Order.new, OpenStruct.new).perform(Address.new, Date.tomorrow)
